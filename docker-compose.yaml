@@ -1,0 +1,47 @@
+version: '3.9'
+services:
+ backend:
+   build: .
+   volumes:
+     - .:/app
+   ports:
+     - "8000:8000"
+   depends_on:
+     - db
+ db:
+   image: mysql:5.7.22
+   container_name: db
+   restart: always
+   environment:
+     MYSQL_DATABASE: ambassador
+     MYSQL_USER: root
+     MYSQL_PASSWORD: root
+     MYSQL_ROOT_PASSWORD: root
+   volumes:
+     - .dbdata:/var/lib/mysql
+   ports:
+     - "33066:3306"
+
+
+# ================================  COPIED ============================
+# version: '3.9'
+# services:
+#   backend:
+#     build: .
+#     volumes:
+#       - .:/app
+#     ports:
+#       - "8000:8000"
+#     depends_on:
+#       - db
+#   db:
+#     image: mysql:5.7.22
+#     restart: always
+
+#     volumes:
+#       - dbdata:/var/lib/mysql
+#     ports:
+#       - "3306:3306"
+
+# volumes:
+#   dbdata:

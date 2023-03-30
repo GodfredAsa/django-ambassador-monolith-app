@@ -1,0 +1,8 @@
+Django==4.1.7
+djangorestframework==3.14.0
+mysqlclient
+pymysql==1.0.3
+django-mysql==4.9.0
+django-cors-headers==3.14.0
+pyJWT
+Faker==6.6.1

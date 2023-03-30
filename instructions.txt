@@ -1,0 +1,87 @@
+# PERFORM MIGRATION ON THE DOCKER DATABASE
+# 1. go into the docker container and perform the migration
+# NB: backend is the service name
+# Syntax = docker-compose exec <service-name> sh
+#   => docker-compose exec backend sh
+#   => python manage.py migrate
+#
+# 2. CREATING A SUPERUSER IN THE BACKEND IN THE DOCKER container
+# => docker-compose exec backend sh
+#
+# 3. GOING INTO THE DOCKER IMAGE OF THE DB CONTAINER AND VIEW DATA
+# => docker-compose exec <db_name> sh
+# => mysql -p<password> -u<db_name> Eg. mysql -proot -uroot
+# => show databases;
+# => describe database_name;
+# +---------------+--------------+------+-----+---------+----------------+
+# | Field         | Type         | Null | Key | Default | Extra          |
+# +---------------+--------------+------+-----+---------+----------------+
+# | id            | bigint(20)   | NO   | PRI | NULL    | auto_increment |
+# | last_login    | datetime(6)  | YES  |     | NULL    |                |
+# | is_superuser  | tinyint(1)   | NO   |     | NULL    |                |
+# | is_staff      | tinyint(1)   | NO   |     | NULL    |                |
+# | is_active     | tinyint(1)   | NO   |     | NULL    |                |
+# | date_joined   | datetime(6)  | NO   |     | NULL    |                |
+# | first_name    | varchar(255) | NO   |     | NULL    |                |
+# | last_name     | varchar(255) | NO   |     | NULL    |                |
+# | email         | varchar(255) | NO   | UNI | NULL    |                |
+# | password      | varchar(255) | NO   |     | NULL    |                |
+# | is_ambassador | tinyint(1)   | NO   |     | NULL    |                |
+# +---------------+--------------+------+-----+---------+----------------+
+# => use database_name;
+# => perform your normal queries EG.
+# select *from users;
+# --------------------------------------------------------------------------+---------------+
+# | id | last_login | is_superuser | is_staff | is_active | date_joined                | first_name | last_name | email          | password                                                                                 | is_ambassador |
+# +----+------------+--------------+----------+-----------+----------------------------+------------+-----------+----------------+------------------------------------------------------------------------------------------+---------------+
+# |  1 | NULL       |            1 |        1 |         1 | 2023-03-28 18:50:22.653754 |            |           | admin@admin.io | pbkdf2_sha256$390000$DqEsNWtAwdjRGZOMqOKBLF$6d6SGEMkqjQQ0diUyVypG0V5ceZOT7Pu/fx8/SHNWdI= |             1 |
+# +----+------------+--------------+----------+-----------+----------------------------+------------+-----------+----------------+------------------------------------------------------------------------------------------+---------------+
+
+# ADMIN AND AMBASSADOR ENDPOINTS
+# APIs TO BE BUILT
+# POST  = api/admin/register
+# POST  = api/admin/login
+# GET   = api/admin/user
+# POST  = api/admin/logout
+# PUT   = api/admin/users/profile
+# PUT   = api/admin/users/password
+
+# users in the system
+# +------------------+--------------+
+# | EMAIL            | PASSWORD     |
+# +------------------+--------------|
+# | angel@gmail.com  | angels       |
+# | emma@father.com  | my-mum       |
+# | admin@admin.io   | admin12345   |
+# | is_staff         | tinyint(1)   |
+# |                  |              |
+# -----------------------------------
+
+# ADMIN ENPOINTS
+# 1. GET/POST api/admin/products
+# 2. GET/PUT/DELETE api/admin/products/{product_id}
+# 3. GET api/admin/users/{user_id}/links
+# 4. GET api/admin/orders
+# 5. GET api/admin/ambassadors
+
+# NB: Faker is used to populate a database.
+# ==> to populate the database with fake ambassadors
+# cd into the server [backend] and run the command below
+#  python manage.py file_name wihtout the extension. Eg below
+#  ===> python manage.py populate_ambassadors  <===
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
