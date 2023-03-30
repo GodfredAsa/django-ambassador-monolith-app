@@ -23,9 +23,10 @@ class RegisterApiView(APIView):
             email=data['email'],
             password=make_password(data['password'])
         )
-            
-        user.is_ambassador = 0
-        serializer = UserSerializer(user, many = False)
+        # sets the register user to be ambassador if the api is 'api/ambassador
+        # else makes the user admin
+        # data['is_ambassador'] = 'api/ambassador' in request.path
+        serializer = UserSerializer(user, many=False)
         # serializer.is_valid(raise_exception=True)
         user.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -39,9 +40,15 @@ class LoginApiView(APIView):
         user = User.objects.filter(email=email).first()
         if user is None or user.password != login_password:
             raise exceptions.AuthenticationFailed("Invalid user Credentials")
+
+        # scope = 'ambassador' if 'api/ambassador' in request.path else 'admin'
+
         token = JwtAuthentication().generate_jwt_token(user_id=user.id)
+        # token = JwtAuthentication().generate_jwt_token(user_id=user.id, scope=scope)
+
         response = Response()
         response.set_cookie(key='jwt', value=token, httponly=True)
+        # print(user.password + "==== PRINTED PASSWORD")
         response.data = {'message': 'success'}
         return response
     
@@ -87,19 +94,10 @@ class PasswordUpdateApiView(APIView):
     def put(self, request, pk=None):
         user = request.user
         data = request.data
-
         if data['password'] != data['password_confirmed']:
             raise exceptions.APIException("Password do not match")
-
         user.set_password(data['password'])
-
-        print(user.password + "==== MAIN ====")
-
-
         user.save()
-
-        print(user.password + "==== PASSWORD ====")
-
         serializer = UserSerializer(user, many=False)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
