@@ -19,8 +19,8 @@ class JwtAuthentication(BaseAuthentication):
 
         if (is_ambassador and payload['scope'] != 'ambassador') or (not is_ambassador and payload['scope'] != 'admin'):
             raise exceptions.AuthenticationFailed('Invalid Scope')
-        user = User.objects.get(pk=payload['user_id'])
 
+        user = User.objects.get(pk=payload['user_id'])
         if user is None:
             raise exceptions.AuthenticationFailed("User Not Found")
         return user, None
