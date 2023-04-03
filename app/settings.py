@@ -24,7 +24,7 @@ SECRET_KEY = "django-insecure-86ob@_2^0!xh!zv*%8^vloj+xfwhxyduro$577v$*=w-mfnblw
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["0.0.0.0", "127.0.0.1"]
+ALLOWED_HOSTS = ["0.0.0.0", "127.0.0.1", 'localhost']
 
 # Application definition
 
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # added apps
     "rest_framework",
+    'django_redis',
     "corsheaders",
     "core",
     "administrator",
@@ -78,8 +79,19 @@ WSGI_APPLICATION = "app.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+
+# Redis connection settings
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
+REDIS_DB = 0
+
 # connected default and users 
 DATABASES = {
+    # ***** [ DOCKER DATABASE CONTAINER ] *****
+    # ALWAYS ONE OF THE FIRST 2 DATABASES AND BY UN-COMMENTING IT AND CHANGING THE KEY TO DEFAULT
+    # IN CASE YOU WISH TO HAVE MULTIPLE DBs GIVE EACH KEY A DIFFERENT NAME AND BUT ENSURE TO HAVE A
+    # FALLBACK DB WITH THE KEY 'default'
+
     # "default": {
     #     "ENGINE": "django.db.backends.mysql",
     #     "NAME": "ambassador",
@@ -89,6 +101,7 @@ DATABASES = {
     #     "PORT": "3306",
     # },
 
+    # ***** [ LOCAL MYSQL DATABASE ] *****
     "default": {
         "ENGINE": "django.db.backends.mysql",
         "NAME": "ambassador",
@@ -99,11 +112,24 @@ DATABASES = {
         "OPTIONS": {'ssl': {'key': '/map/to/ca-cert.pem'}}
     },
 
-    'user': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    # ***** [ LOCAL sqlite DATABASE ] *****
+    # 'users': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     "NAME": BASE_DIR / "db.sqlite3",
+    # }
 }
+
+# Redis cache backend
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        },
+    },
+}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators

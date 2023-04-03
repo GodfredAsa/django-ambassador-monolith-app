@@ -15,4 +15,3 @@ class Command(BaseCommand):
                 price=randrange(10, 100)
 
             )
-            # product.save()

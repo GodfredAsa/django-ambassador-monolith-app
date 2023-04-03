@@ -14,8 +14,10 @@ class JwtAuthentication(BaseAuthentication):
             return None
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
-        except jwt.ExpiredSignatureError:
-            raise exceptions.AuthenticationFailed("Unauthenticated")
+        except jwt.ExpiredSignatureError as e:
+            raise exceptions.AuthenticationFailed("Unauthenticated") from e
+
+        # We do not allow users without admin or ambassador scope to log-in
 
         if (is_ambassador and payload['scope'] != 'ambassador') or (not is_ambassador and payload['scope'] != 'admin'):
             raise exceptions.AuthenticationFailed('Invalid Scope')
@@ -26,9 +28,9 @@ class JwtAuthentication(BaseAuthentication):
         return user, None
 
     @staticmethod
-    def generate_jwt_token(user_id, scope):
+    def generate_jwt_token(id, scope):
         payload = {
-            'user_id': user_id,
+            'user_id': id,
             'scope': scope,
             'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1),
             'iat': datetime.datetime.utcnow(),

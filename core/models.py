@@ -10,7 +10,7 @@ class UserManager(BaseUserManager):
             raise ValueError("Email is required")
         if not password:
             raise ValueError("Password is required")
-        
+
         user: User = self.model(
             email=self.normalize_email(email)
         )
@@ -20,13 +20,13 @@ class UserManager(BaseUserManager):
         user.is_staff = False
         user.save(using=self._db)
         return user
-        
+
     def create_superuser(self, email: string, password: str = None):
         if not email:
             raise ValueError("Email is required")
         if not password:
             raise ValueError("Password is required")
-        
+
         user: User = self.model(
             email=self.normalize_email(email)
         )
@@ -52,6 +52,15 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
     objects = UserManager()
+
+    @property
+    def name(self):
+        return f"{self.first_name} {self.last_name}"
+
+    @property
+    def revenue(self):
+        orders = Order.objects.filter(user_id=self.pk, complete=True)
+        return sum(order.ambassador_revenue for order in orders)
 
 
 class Product(models.Model):
@@ -85,6 +94,15 @@ class Order(models.Model):
     created_at = models.TimeField(auto_now_add=True)
     updated_at = models.TimeField(auto_now=True)
 
+    @property
+    def name(self):
+        return f"{self.first_name} {self.last_name}"
+
+    @property
+    def ambassador_revenue(self):
+        order_items = OrderItems.objects.filter(order_id=self.pk)
+        return sum(item.ambassador_revenue for item in order_items)
+
 
 class OrderItems(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
@@ -95,17 +113,3 @@ class OrderItems(models.Model):
     ambassador_revenue = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.TimeField(auto_now_add=True)
     updated_at = models.TimeField(auto_now=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-

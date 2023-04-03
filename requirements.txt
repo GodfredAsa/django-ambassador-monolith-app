@@ -6,3 +6,4 @@ django-mysql==4.9.0
 django-cors-headers==3.14.0
 pyJWT
 Faker==6.6.1
+django-redis==5.2.0

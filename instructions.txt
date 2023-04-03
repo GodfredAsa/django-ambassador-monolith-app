@@ -72,6 +72,8 @@
 
 
 # AMBASSADOR ENDPOINTS
+#  [ scope is introduced to prevent admin from accessing ambassador resources and vice versa ]
+#  also admin can also login as ambassador but not the vice versa
 # APIs TO BE BUILT
 # POST  = api/ambassador/register
 # POST  = api/ambassador/login
