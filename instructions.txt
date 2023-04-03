@@ -37,7 +37,7 @@
 # |  1 | NULL       |            1 |        1 |         1 | 2023-03-28 18:50:22.653754 |            |           | admin@admin.io | pbkdf2_sha256$390000$DqEsNWtAwdjRGZOMqOKBLF$6d6SGEMkqjQQ0diUyVypG0V5ceZOT7Pu/fx8/SHNWdI= |             1 |
 # +----+------------+--------------+----------+-----------+----------------------------+------------+-----------+----------------+------------------------------------------------------------------------------------------+---------------+
 
-# ADMIN AND AMBASSADOR ENDPOINTS
+# ADMIN ENDPOINTS
 # APIs TO BE BUILT
 # POST  = api/admin/register
 # POST  = api/admin/login
@@ -71,7 +71,16 @@
 #  ===> python manage.py populate_ambassadors  <===
 
 
-
+# AMBASSADOR ENDPOINTS
+#  [ scope is introduced to prevent admin from accessing ambassador resources and vice versa ]
+#  also admin can also login as ambassador but not the vice versa
+# APIs TO BE BUILT
+# POST  = api/ambassador/register
+# POST  = api/ambassador/login
+# GET   = api/ambassador/user
+# POST  = api/ambassador/logout
+# PUT   = api/ambassador/users/profile
+# PUT   = api/ambassador/users/password
 
 
 

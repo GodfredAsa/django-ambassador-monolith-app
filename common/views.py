@@ -9,10 +9,9 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.hashers import make_password
 
 
-
 class RegisterApiView(APIView):
-    def post(self, request):
 
+    def post(self, request):
         data = request.data
         if data['password'] != data['password_confirmed']:
             raise exceptions.APIException("Passwords do not match")
@@ -23,9 +22,9 @@ class RegisterApiView(APIView):
             email=data['email'],
             password=make_password(data['password'])
         )
-            
-        user.is_ambassador = 0
-        serializer = UserSerializer(user, many = False)
+
+        data['is_ambassador'] = 'api/ambassador' in request.path
+        serializer = UserSerializer(user, many=False)
         # serializer.is_valid(raise_exception=True)
         user.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -36,22 +35,37 @@ class LoginApiView(APIView):
         data = request.data
         email = data['email']
         login_password = data['password']
+
         user = User.objects.filter(email=email).first()
-        if user is None or user.password != login_password:
-            raise exceptions.AuthenticationFailed("Invalid user Credentials")
-        token = JwtAuthentication().generate_jwt_token(user_id=user.id)
+        if user is None:
+            raise exceptions.AuthenticationFailed("User not found")
+
+        if not user.check_password(login_password):
+            raise exceptions.AuthenticationFailed("Invalid user password")
+
+        scope = 'ambassador' if 'api/ambassador' in request.path else 'admin'
+
+        # ambassador restriction
+        if user.is_ambassador and scope == 'admin':
+            raise exceptions.AuthenticationFailed("Unauthorized")
+
+        token = JwtAuthentication().generate_jwt_token(id=user.id, scope=scope)
         response = Response()
         response.set_cookie(key='jwt', value=token, httponly=True)
         response.data = {'message': 'success'}
         return response
-    
-    
+
+
 class UserApiView(APIView):
     authentication_classes = [JwtAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        return Response(UserSerializer(request.user).data)
+        user = request.user
+        data = UserSerializer(request.user).data
+        if 'api/ambassador' in request.path:
+            data['revenue'] = user.revenue
+        return Response(data)
 
 
 # NB: Logout => just remove the cookie using the response
@@ -61,6 +75,7 @@ class LogoutApiView(APIView):
 
     def post(self, _):
         response = Response()
+        print("logging out ")
         response.delete_cookie(key='jwt')
         response.data = {'message': 'success'}
         return response
@@ -87,20 +102,9 @@ class PasswordUpdateApiView(APIView):
     def put(self, request, pk=None):
         user = request.user
         data = request.data
-
         if data['password'] != data['password_confirmed']:
             raise exceptions.APIException("Password do not match")
-
         user.set_password(data['password'])
-
-        print(user.password + "==== MAIN ====")
-
-
         user.save()
-
-        print(user.password + "==== PASSWORD ====")
-
         serializer = UserSerializer(user, many=False)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
